@@ -8,7 +8,7 @@ def conectar():
 
 
 #Funcion para agregar producto
-def agregar(codigo, nombre, descripcion):
+def agregar(codigo, nombre, descripcion, precio, costo):
         con, cur =conectar()
         #utilizo la funcion para ponerlo en minuscula
         nombre = nombre.lower()
@@ -22,7 +22,7 @@ def agregar(codigo, nombre, descripcion):
             print(f"El producto {nombre.upper()} ya existe en la lista de productos")
         #Sino agrego un nuevo producto a la base de datos
         else:
-            cur.execute("INSERT INTO productos (codigo, nombre, descripcion) VALUES (?, ?, ?)", (codigo, nombre, descripcion))
+            cur.execute("INSERT INTO productos (codigo, nombre, descripcion, precio, costo) VALUES (?, ?, ?, ?, ?)", (codigo, nombre, descripcion, precio, costo))
             print(f"El producto {nombre.upper()} fue agregado correctamente")
         con.commit()
         cur.close()
@@ -69,23 +69,42 @@ def buscarPorNombre(nombre):
     con.close()
 
 #Funcion para realizar una compra en el sistema
-def comprar(codigo, stock):
+def comprar():
     con, cur =conectar()
-    #Valida por su codigo si el producto se encuentra en la base de datos
-    cur.execute("SELECT * FROM productos WHERE codigo = ? ",
-                (codigo, ))
-    #Trae la fila convertida en una tupla para poder mostrarla por pantalla
-    producto = cur.fetchone()
-    #Si el producto existe
-    if producto:
-        #Realiza una actualizacion del stock de la base de datos sumandole la cantidad ingresada en la compra
-        cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?" 
-                    ,(stock, codigo))
-        #Envia  un mensaje de confirmacion
+    productos_comprados=[]
+    while True:
+        opcion = int(input("""
+                Elija una opcion:
+                1--Agregar Nuevo Producto
+                2--Finalizar Compra
+"""))
+        if opcion == 1:
+            codigo=int(input("Ingrese Codigo de Producto: "))
+            stock=int(input("Ingrese cantidad: "))
+        #Valida por su codigo si el producto se encuentra en la base de datos
+            cur.execute("SELECT * FROM productos WHERE codigo = ? ",
+                    (codigo, ))
+        #Trae la fila convertida en una tupla para poder mostrarla por pantalla
+            producto = cur.fetchone()
+            if producto:
+                productos_comprados.append(producto)
+            else:
+            #Si el producto no existe envia un msj por consola
+                print("El producto no existe")
+            #Si el producto existe
+            for producto in productos_comprados:
+            #Realiza una actualizacion del stock de la base de datos sumandole la cantidad ingresada en la compra
+                cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?" 
+                        ,(stock, codigo))
+            #Envia  un mensaje de confirmacion
+        elif opcion == 2:
+                print("productos_comprados")
+                break
+        else:
+            print("elija una opcion valida")
         print("Compra realizada correctamente")
-    else:
-        #Si el producto no existe envia un msj por consola
-        print("El producto no existe")
+        print(productos_comprados)
+   
     con.commit()
     cur.close()
     con.close()
@@ -137,3 +156,5 @@ def verificarBajoStock():
     cur.close()
     con.close()
 
+# agregar(100,"Pelota","Pelota de futbol n5 marca pelota",1500.00, 1000)
+comprar()
