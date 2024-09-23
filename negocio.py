@@ -86,6 +86,7 @@ def comprar():
     id_boleta = nuevo_numero
     fecha = datetime.date.today()
     total = 0
+    sub_total = 0
     cur.execute("INSERT INTO boletas (id_boleta, fecha,total) values (?,?,?) ", (id_boleta, fecha, total))
     while True:
         opcion = int(input("""
@@ -112,6 +113,7 @@ def comprar():
             #Realiza una actualizacion del stock de la base de datos sumandole la cantidad ingresada en la compra
                 cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?" 
                         ,(stock, codigo))
+                cur.execute("INSERT INTO detalle_boleta (id_boleta,codigo_producto,cantidad,subtotal) VALUES (?,?,?,?)", (id_boleta,producto[0],stock,sub_total))
             #Envia  un mensaje de confirmacion
         elif opcion == 2:
                 print("productos_comprados")

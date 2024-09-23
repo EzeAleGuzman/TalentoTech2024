@@ -31,7 +31,7 @@ cur.execute('''
 
 cur.execute('''
             CREATE TABLE IF NOT EXISTS detalle_boleta(
-                id_detalle_boleta  INT BIGINT PRIMARY KEY,
+                id_detalle_boleta  INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_boleta INT NOT NULL,
                 codigo_producto BIGINT NOT NULL,
                 cantidad INT NOT NULL,
