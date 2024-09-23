@@ -74,29 +74,22 @@ def buscarPorNombre(nombre):
 def comprar():
     con, cur =conectar()
     productos_comprados=[]
-    #Busca en la base de datos la ultima boleta y le suma 1
-    cur.execute("SELECT id_boleta FROM boletas ORDER BY id_boleta DESC LIMIT 1")
-    ultimo_id = cur.fetchone()
-
-    # Iniciar el nuevo número de boleta
-    if ultimo_id:
-        nuevo_numero = ultimo_id[0] + 1
-    else:
-        nuevo_numero = 1 
-    id_boleta = nuevo_numero
+    id_boleta = crearBoleta()
     fecha = datetime.date.today()
     total = 0
     sub_total = 0
     cur.execute("INSERT INTO boletas (id_boleta, fecha,total) values (?,?,?) ", (id_boleta, fecha, total))
     while True:
         opcion = int(input("""
-                Elija una opcion:
-                1--Agregar Nuevo Producto
-                2--Finalizar Compra
+        Elija una opcion:
+        1--Agregar Nuevo Producto
+        2--Finalizar Compra
 """))
         if opcion == 1:
             codigo=int(input("Ingrese Codigo de Producto: "))
             stock=int(input("Ingrese cantidad: "))
+            
+            
         #Valida por su codigo si el producto se encuentra en la base de datos
             cur.execute("SELECT * FROM productos WHERE codigo = ? ",
                     (codigo, ))
@@ -130,6 +123,23 @@ def comprar():
     con.commit()
     cur.close()
     con.close()
+    
+def crearBoleta():
+    con, cur =conectar()
+    #Busca en la base de datos la ultima boleta y le suma 1
+    cur.execute("SELECT id_boleta FROM boletas ORDER BY id_boleta DESC LIMIT 1")
+    ultimo_id = cur.fetchone()
+
+    # Iniciar el nuevo número de boleta
+    if ultimo_id:
+        nuevo_numero = ultimo_id[0] + 1
+    else:
+        nuevo_numero = 1 
+    id_boleta = nuevo_numero
+    cur.close()
+    con.close()
+    return id_boleta
+    
 
 def vender(codigo, stock):
     try:
