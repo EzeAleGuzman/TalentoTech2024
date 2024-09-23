@@ -108,16 +108,20 @@ def comprar():
                 print("El producto no existe")
             #Si el producto existe
             for producto in productos_comprados:
+                sub_total=producto[5] * stock
             #Realiza una actualizacion del stock de la base de datos sumandole la cantidad ingresada en la compra
                 cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?" 
                         ,(stock, codigo))
-                cur.execute()
             #Envia  un mensaje de confirmacion
         elif opcion == 2:
                 print("productos_comprados")
+                
                 break
         else:
             print("elija una opcion valida")
+        total= sub_total + total
+        print(total)
+        cur.execute("UPDATE boletas SET total = ? WHERE id_boleta = ?", (total, id_boleta))
         print("Compra realizada correctamente")
         print(productos_comprados)
    
