@@ -1,4 +1,6 @@
 import sqlite3
+import os
+import datetime
 from colorama import Fore
 
 def conectar():
@@ -72,6 +74,19 @@ def buscarPorNombre(nombre):
 def comprar():
     con, cur =conectar()
     productos_comprados=[]
+    #Busca en la base de datos la ultima boleta y le suma 1
+    cur.execute("SELECT id_boleta FROM boletas ORDER BY id_boleta DESC LIMIT 1")
+    ultimo_id = cur.fetchone()
+
+    # Iniciar el nuevo número de boleta
+    if ultimo_id:
+        nuevo_numero = ultimo_id[0] + 1
+    else:
+        nuevo_numero = 1 
+    id_boleta = nuevo_numero
+    fecha = datetime.date.today()
+    total = 0
+    cur.execute("INSERT INTO boletas (id_boleta, fecha,total) values (?,?,?) ", (id_boleta, fecha, total))
     while True:
         opcion = int(input("""
                 Elija una opcion:
@@ -96,6 +111,7 @@ def comprar():
             #Realiza una actualizacion del stock de la base de datos sumandole la cantidad ingresada en la compra
                 cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?" 
                         ,(stock, codigo))
+                cur.execute()
             #Envia  un mensaje de confirmacion
         elif opcion == 2:
                 print("productos_comprados")
@@ -156,5 +172,5 @@ def verificarBajoStock():
     cur.close()
     con.close()
 
-# agregar(100,"Pelota","Pelota de futbol n5 marca pelota",1500.00, 1000)
+
 comprar()
