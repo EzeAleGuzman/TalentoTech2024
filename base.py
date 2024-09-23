@@ -12,8 +12,10 @@ cur.execute('''
                 descripcion TEXT,
                 stock INT DEFAULT 0, 
                 activo BOOLEAN DEFAULT TRUE
+                CHECK (stock >= 0)
             )
 ''')
+
 
 
 #Confirmo los cambios en la base de datos

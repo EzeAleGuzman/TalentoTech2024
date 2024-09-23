@@ -91,33 +91,49 @@ def comprar(codigo, stock):
     con.close()
 
 def vender(codigo, stock):
+    try:
+        con, cur =conectar()
+        cur.execute("SELECT * FROM productos WHERE codigo = ? ", (codigo, ))
+        producto = cur.fetchone()
+        if producto:
+            cur.execute("UPDATE productos SET stock = stock - ? WHERE codigo = ?" , (stock, codigo))
+            print("Venta realizada correctamente")
+        else:
+            print("El producto no existe")
+    except sqlite3.IntegrityError:
+            print(Fore.RED+"Cantidad Insuficiente para realizar venta. Verifique el stock")
+            print(Fore.RESET)
+    finally:
+        con.commit()
+        cur.close()
+        con.close()
+
+def eliminarProducto(codigo):
     con, cur =conectar()
     cur.execute("SELECT * FROM productos WHERE codigo = ? ", (codigo, ))
     producto = cur.fetchone()
     if producto:
-        cur.execute("UPDATE productos SET stock = stock - ? WHERE codigo = ?" , (stock, codigo))
-        print("Compra realizada correctamente")
-    else:
-        print("El producto no existe")
-    con.commit()
-    cur.close()
-    con.close()
-
-def eliminarProducto(nombre):
-    con, cur =conectar()
-    cur.execute("SELECT * FROM productos WHERE nombre = ? ", (nombre, ))
-    producto = cur.fetchone()
-    if producto:
-        cur.execute("DELETE FROM productos WHERE  nombre = ?" , ( nombre, ))
+        cur.execute("DELETE FROM productos WHERE  codigo = ?" , ( codigo, ))
         print("Producto borrado correctamente")
     else:
         print("El producto no existe")
     con.commit()
     cur.close()
     con.close()
-    
 
-agregar(104,"Buzos","")
-verProductos()
-vender(104,30)
-verProductos()
+def verificarBajoStock():
+    con, cur =conectar()
+    cur.execute("SELECT * FROM productos WHERE stock < 6 AND activo =TRUE ")
+    productos = cur.fetchall()
+    if productos:
+        # Encabezados de las columnas
+        print(f"{'Nombre':<20} {'Cantidad':<10}")  # Encabezados con formato
+        print("=" * 30)  # Línea divisoria
+        # Imprimir nombre y cantidad (stock) formateado
+        for producto in productos:
+            print(f"{producto[1]:<20} {producto[3]:<10}")
+    else:
+        print("No hay productos con Baja Cantidad.")
+    cur.close()
+    con.close()
+

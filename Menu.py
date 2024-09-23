@@ -7,11 +7,12 @@ def MostrarMenu():
     print(Fore.BLACK +'Seleccione una opcion')
     print('1--Agregar Producto')
     print('2--Mostar Productos')
-    print('3--Actualizar Cantidad de producto')
-    print('4--Eliminar Producto')
-    print('5--Buscar Producto')
-    print('6--Reporte de Bajo Stock')
-    print('7--Salir')
+    print('3--Compra Productos')
+    print('4--Vender Productos')
+    print('5--Eliminar Producto')
+    print('6--Buscar Producto')
+    print('7--Reporte de Bajo Stock')
+    print('8--Salir')
     print(Fore.GREEN + '*'*50)
 
 
