@@ -70,58 +70,85 @@ def buscarPorNombre(nombre):
     con.close()
 
 #Funcion para realizar una compra en el sistema
+import datetime
+
 def comprar():
-    con, cur =conectar()
-    productos_comprados=[]
-    id_boleta = crearBoleta()
+    con, cur = conectar()
+    productos_comprados = []
+    id_boleta = crearBoleta()  # Función que genera el ID de la boleta
     fecha = datetime.date.today()
     total = 0
-    sub_total = 0
-    cur.execute("INSERT INTO boletas (id_boleta, fecha,total) values (?,?,?) ", (id_boleta, fecha, total))
+    
+    # Insertar boleta con el total inicial en 0
+    cur.execute("INSERT INTO boletas (id_boleta, fecha, total) VALUES (?, ?, ?)", (id_boleta, fecha, total))
+
     while True:
         opcion = int(input("""
-        Elija una opcion:
-        1--Agregar Nuevo Producto
-        2--Finalizar Compra
-"""))
+        Elija una opción:
+    1--Agregar Nuevo Producto
+    2--Finalizar Compra
+        """))
+
         if opcion == 1:
-            codigo=int(input("Ingrese Codigo de Producto: "))
-            stock=int(input("Ingrese cantidad: "))
+            print(Fore.CYAN+"-----------Compra de Productos---------")
+            codigo = int(input("Ingrese codigo del producto:  "))
+            cantidad = int(input("Ingrese la cantidad de producto comprado:  "))
             
-            
-        #Valida por su codigo si el producto se encuentra en la base de datos
-            cur.execute("SELECT * FROM productos WHERE codigo = ? ",
-                    (codigo, ))
-        #Trae la fila convertida en una tupla para poder mostrarla por pantalla
+            # Validar si el producto existe
+            cur.execute("SELECT * FROM productos WHERE codigo = ?", (codigo,))
             producto = cur.fetchone()
+            
             if producto:
-                productos_comprados.append(producto)
-            else:
-            #Si el producto no existe envia un msj por consola
-                print("El producto no existe")
-            #Si el producto existe
-            for producto in productos_comprados:
-                sub_total=producto[5] * stock
-            #Realiza una actualizacion del stock de la base de datos sumandole la cantidad ingresada en la compra
-                cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?" 
-                        ,(stock, codigo))
-                cur.execute("INSERT INTO detalle_boleta (id_boleta,codigo_producto,cantidad,subtotal) VALUES (?,?,?,?)", (id_boleta,producto[0],stock,sub_total))
-            #Envia  un mensaje de confirmacion
-        elif opcion == 2:
-                print("productos_comprados")
+                precio_unitario = producto[5]  # Suponiendo que el precio está en la posición 5
+                sub_total = precio_unitario * cantidad
+                total += sub_total
                 
-                break
+                # Actualizar el stock del producto
+                cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?", (cantidad, codigo))
+                
+                # Insertar el detalle de la boleta
+                cur.execute("INSERT INTO detalle_boleta (id_boleta, codigo_producto, cantidad, subtotal) VALUES (?, ?, ?, ?)",
+                            (id_boleta, codigo, cantidad, sub_total))
+                
+                # Agregar el producto comprado a la lista
+                productos_comprados.append({
+                    'codigo': codigo,
+                    'nombre': producto[1],
+                    'cantidad': cantidad,
+                    'precio_unitario': precio_unitario,
+                    'subtotal': sub_total
+                })
+
+                print(f"Producto agregado: {producto[1]} - Cantidad: {cantidad} - Subtotal: ${sub_total:.2f}")
+            else:
+                print("El producto no existe")
+
+        elif opcion == 2:
+            # Mostrar resumen de la compra
+             # Encabezados de las columnas
+            print("\nResumen de la compra:")
+            print(f"{'Producto':<20}  {'cantidad':<20}  {'subtotal':<20}")  # Encabezados con formato
+            print("=" * 80)  # Línea divisoria
+            
+            for item in productos_comprados:
+                print(f"{item['nombre']:<20} {item['cantidad']:<20}  ${item['subtotal']::<20.2f}")
+                print("-" * 80)
+            print(f"Total de la compra: ${total:.2f}")
+
+            # Actualizar el total en la boleta
+            cur.execute("UPDATE boletas SET total = ? WHERE id_boleta = ?", (total, id_boleta))
+            
+            # Confirmar y finalizar la compra
+            print("Compra realizada correctamente.")
+            break
+
         else:
-            print("elija una opcion valida")
-        total= sub_total + total
-        print(total)
-        cur.execute("UPDATE boletas SET total = ? WHERE id_boleta = ?", (total, id_boleta))
-        print("Compra realizada correctamente")
-        print(productos_comprados)
-   
+            print("Elija una opción válida.")
+    
     con.commit()
     cur.close()
     con.close()
+
     
 def crearBoleta():
     con, cur =conectar()

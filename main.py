@@ -23,10 +23,7 @@ while (True):
         print(Fore.BLUE+"-"* 35 +"Productos"+ "-" * 35)
         verProductos()
     elif (opcion == 3):
-        print(Fore.CYAN+"-----------Compra de Productos---------")
-        codigo = int(input("Ingrese codigo del producto:  "))
-        cantidad = int(input("Ingrese la cantidad de producto comprado:  "))
-        comprar(codigo,cantidad)
+        comprar()
     elif (opcion == 4):
         print(Fore.CYAN+"-----------Venta de Productos---------")
         codigo = int(input("Ingrese codigo del producto:  "))
