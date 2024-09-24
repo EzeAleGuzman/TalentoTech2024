@@ -1,5 +1,4 @@
 import sqlite3
-import os
 import datetime
 from colorama import Fore
 
