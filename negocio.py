@@ -1,6 +1,7 @@
 import sqlite3
 import datetime
 from colorama import Fore
+from beautifultable import BeautifulTable
 
 def conectar():
     con = sqlite3.connect('productos.db')
@@ -99,7 +100,7 @@ def comprar():
             producto = cur.fetchone()
             
             if producto:
-                precio_unitario = producto[5]  # Suponiendo que el precio está en la posición 5
+                precio_unitario = producto[6]  # Suponiendo que el precio está en la posición 5
                 sub_total = precio_unitario * cantidad
                 total += sub_total
                 
@@ -118,28 +119,32 @@ def comprar():
                     'precio_unitario': precio_unitario,
                     'subtotal': sub_total
                 })
-
-                print(f"Producto agregado: {producto[1]} - Cantidad: {cantidad} - Subtotal: ${sub_total:.2f}")
             else:
-                print("El producto no existe")
+                print(Fore.RED +"El producto no existe")
 
         elif opcion == 2:
-            # Mostrar resumen de la compra
-             # Encabezados de las columnas
-            print("\nResumen de la compra:")
-            print(f"{'Producto':<20}  {'cantidad':<20}  {'subtotal':<20}")  # Encabezados con formato
-            print("=" * 80)  # Línea divisoria
-            
+                    # Mostrar resumen de la compra
+            print(Fore.LIGHTYELLOW_EX)
+            # Crear una tabla
+            tabla = BeautifulTable()
+
+            # Configurar los encabezados de la tabla
+            tabla.columns.header = ["Producto", "Cantidad", "Precio Unitario", "Subtotal"]
+
+            # Agregar filas a la tabla
             for item in productos_comprados:
-                print(f"{item['nombre']:<20} {item['cantidad']:<20}  ${item['subtotal']::<20.2f}")
-                print("-" * 80)
+                tabla.rows.append([item['nombre'], item['cantidad'], f"${item['precio_unitario']:.2f}", f"${item['subtotal']:.2f}"])
+            print(f"-" * 19 + " Resumen de la compra Boleta N°" + str(id_boleta) + " " + "-" * 19)
+            print(tabla)
+            print("-" * 80)
+
             print(f"Total de la compra: ${total:.2f}")
 
             # Actualizar el total en la boleta
             cur.execute("UPDATE boletas SET total = ? WHERE id_boleta = ?", (total, id_boleta))
-            
+
             # Confirmar y finalizar la compra
-            print("Compra realizada correctamente.")
+            print("Falta Verificar proveedores")# Mostrar resumen de la compra
             break
 
         else:
@@ -160,7 +165,7 @@ def crearBoleta():
     if ultimo_id:
         nuevo_numero = ultimo_id[0] + 1
     else:
-        nuevo_numero = 1 
+        nuevo_numero = 100000001 
     id_boleta = nuevo_numero
     cur.close()
     con.close()
@@ -213,6 +218,3 @@ def verificarBajoStock():
         print("No hay productos con Baja Cantidad.")
     cur.close()
     con.close()
-
-
-comprar()
