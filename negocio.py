@@ -75,9 +75,6 @@ def comprar():
     id_boleta = crearBoleta()  # Función que genera el ID de la boleta
     fecha = datetime.date.today()
     total = 0
-    
-    # Insertar boleta con el total inicial en 0
-    cur.execute("INSERT INTO boletas (id_boleta, fecha, total) VALUES (?, ?, ?)", (id_boleta, fecha, total))
 
     while True:
         opcion = int(input("""
@@ -96,6 +93,8 @@ def comprar():
             producto = cur.fetchone()
             
             if producto:
+                # Insertar boleta con el total inicial en 0
+                cur.execute("INSERT INTO boletas (id_boleta, fecha, total) VALUES (?, ?, ?)", (id_boleta, fecha, total))
                 precio_unitario = producto[6]  # Suponiendo que el precio está en la posición 5
                 sub_total = precio_unitario * cantidad
                 total += sub_total
