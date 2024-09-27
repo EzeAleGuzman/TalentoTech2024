@@ -16,17 +16,18 @@ while (True):
         break
     elif (opcion == 1):
         print(Fore.RED+"Ingrese los datos del producto")
+        codigo = int(input('Ingrese el codigo del producto: '))
         nombre = input('Nombre del producto: ')
-        cantidad = int(input('Ingrese la cantidad de producto: '))
-        agregar(nombre,cantidad)
+        descripcion = (input('Ingrese breve descripcion: '))
+        precio = float(input("Ingrese el precio de Venta: "))
+        costo = float(input("Ingrese Precio de costo: "))
+        agregar(codigo, nombre, descripcion, precio, costo)
     elif (opcion == 2):
         print(Fore.BLUE+"-"* 35 +"Productos"+ "-" * 35)
         verProductos()
     elif (opcion == 3):
-        print(Fore.CYAN+"-----------Compra de Productos---------")
-        codigo = int(input("Ingrese codigo del producto:  "))
-        cantidad = int(input("Ingrese la cantidad de producto comprado:  "))
-        comprar(codigo,cantidad)
+        comprar()
+
     elif (opcion == 4):
         print(Fore.CYAN+"-----------Venta de Productos---------")
         codigo = int(input("Ingrese codigo del producto:  "))
