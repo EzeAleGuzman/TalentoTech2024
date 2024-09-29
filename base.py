@@ -1,10 +1,10 @@
 import sqlite3
 
-#Se crea coneccion o  si no existe se crea la base de datos
+# Se crea conexión o si no existe se crea la base de datos
 con = sqlite3.connect('productos.db')
-
 cur = con.cursor()
 
+# Crear tabla productos
 cur.execute('''
             CREATE TABLE IF NOT EXISTS productos(
                 codigo BIGINT PRIMARY KEY,
@@ -18,35 +18,80 @@ cur.execute('''
             )
 ''')
 
+# Crear tabla boletas
 cur.execute('''
             CREATE TABLE IF NOT EXISTS boletas(
-                id_boleta INT BIGINT PRIMARY KEY,
+                id_boleta BIGINT PRIMARY KEY,
                 fecha DATETIME NOT NULL,
                 total REAL NOT NULL
-                
             )
-            
 ''')
 
-
+# Crear tabla detalle_boleta
 cur.execute('''
             CREATE TABLE IF NOT EXISTS detalle_boleta(
                 id_detalle_boleta  INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_boleta INT NOT NULL,
+                id_boleta BIGINT NOT NULL,
                 codigo_producto BIGINT NOT NULL,
                 cantidad INT NOT NULL,
                 subtotal REAL NOT NULL,
                 FOREIGN KEY (id_boleta) REFERENCES boletas(id_boleta),
                 FOREIGN KEY (codigo_producto) REFERENCES productos(codigo)
-                
             )
-            
-            
 ''')
 
-#Confirmo los cambios en la base de datos
+# Crear tabla clientes
+cur.execute('''
+            CREATE TABLE IF NOT EXISTS clientes(
+                id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
+                nombre TEXT NOT NULL,
+                apellido TEXT NOT NULL,
+                telefono TEXT NOT NULL,
+                id_direccion BIGINT NOT NULL,
+                estado_cuenta REAL NOT NULL,
+                FOREIGN KEY (id_direccion) REFERENCES direcciones(id_direccion)
+            )
+''')
+
+# Crear tabla proveedores
+cur.execute('''
+            CREATE TABLE IF NOT EXISTS proveedores(
+                id_proveedor INTEGER PRIMARY KEY AUTOINCREMENT,
+                nombre TEXT NOT NULL,
+                apellido TEXT NOT NULL,
+                telefono TEXT NOT NULL,
+                id_direccion BIGINT NOT NULL,
+                estado_cuenta REAL NOT NULL,
+                FOREIGN KEY (id_direccion) REFERENCES direcciones(id_direccion)
+            )
+''')
+
+# Crear tabla direccion
+cur.execute(''' 
+            CREATE TABLE IF NOT EXISTS direccion(
+                id_direccion INTEGER PRIMARY KEY AUTOINCREMENT,
+                calle TEXT NOT NULL,
+                altura TEXT NOT NULL,
+                partido TEXT NOT NULL
+            )
+''')
+
+# Crear tabla transacciones
+cur.execute('''
+            CREATE TABLE IF NOT EXISTS transacciones(
+                id_transaccion INTEGER PRIMARY KEY AUTOINCREMENT,
+                fecha DATETIME NOT NULL,
+                monto REAL NOT NULL,
+                tipo_transaccion TEXT NOT NULL CHECK (tipo_transaccion IN ('compra', 'venta', 'pago_cliente', 'pago_proveedor')),
+                id_cliente INTEGER,
+                id_proveedor INTEGER,
+                FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
+                FOREIGN KEY (id_proveedor) REFERENCES proveedores(id_proveedor)
+            )
+''')
+
+# Confirmo los cambios en la base de datos
 con.commit()
 
-
-#Cierro la conexion
+# Cierro la conexión
 con.close()

@@ -100,7 +100,8 @@ def comprar():
                 total += sub_total
                 
                 # Actualizar el stock del producto
-                cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?", (cantidad, codigo))
+                cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?" , (cantidad, codigo))
+                print("Stock actualizado para la compra")
                 
                 # Insertar el detalle de la boleta
                 cur.execute("INSERT INTO detalle_boleta (id_boleta, codigo_producto, cantidad, subtotal) VALUES (?, ?, ?, ?)",
@@ -148,7 +149,7 @@ def comprar():
     con.commit()
     cur.close()
     con.close()
- 
+
 def crearBoleta():
     con, cur =conectar()
     #Busca en la base de datos la ultima boleta y le suma 1
@@ -172,7 +173,8 @@ def vender(codigo, stock):
         producto = cur.fetchone()
         if producto:
             cur.execute("UPDATE productos SET stock = stock - ? WHERE codigo = ?" , (stock, codigo))
-            print("Venta realizada correctamente")
+            print("stock actualizado para la venta")
+            
         else:
             print("El producto no existe")
     except sqlite3.IntegrityError:
@@ -207,10 +209,17 @@ def verificarBajoStock():
     cur.close()
     con.close()
 
+#funcion para crear una tabla
 def crearTabla(productos):
-    table = BeautifulTable()
-    table.columns.header = ["Codigo", "nombre", "descripcion", "stock"]
-    # Imprimimos los productos
-    for producto in productos:
-        table.rows.append(producto)
-    print(table)
+    try:
+        table = BeautifulTable()
+        table.columns.header = ["Codigo", "nombre", "descripcion", "stock"]
+        # Imprimimos los productos
+        for producto in productos:
+            table.rows.append(producto)
+        print(table)
+    #maneja la excepcion y la muestra en pantall
+    except Exception as e:
+        print(e)
+    finally:
+        pass
