@@ -32,9 +32,15 @@ while (True):
         print(Fore.CYAN+"-----------Venta de Productos---------")
         codigo = int(input("Ingrese codigo del producto:  "))
         cantidad = int(input("Ingrese la cantidad de producto comprado:  "))
-        vender(codigo,cantidad)      
+        vender(codigo,cantidad)
+    elif (opcion == 7):
+        verificarBajoStock()
+    elif (opcion == 6):
+        nombre = input("Cual es el nombre del producto que deseas buscar").lower()
+        buscarPorNombre(nombre)      
     else:
         print('Ingrese Una opcion valida')
     MostrarMenu()
+
 print(Fore.BLACK)  
 
