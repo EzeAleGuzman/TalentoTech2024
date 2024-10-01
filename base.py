@@ -43,12 +43,12 @@ cur.execute('''
 # Crear tabla clientes
 cur.execute('''
             CREATE TABLE IF NOT EXISTS clientes(
-                id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_cliente BIGINT PRIMARY KEY,
                 nombre TEXT NOT NULL,
                 apellido TEXT NOT NULL,
                 telefono TEXT NOT NULL,
                 id_direccion BIGINT NOT NULL,
-                estado_cuenta REAL NOT NULL,
+                estado_cuenta REAL NOT NULL DEFAULT 0,
                 FOREIGN KEY (id_direccion) REFERENCES direcciones(id_direccion)
             )
 ''')
@@ -56,7 +56,7 @@ cur.execute('''
 # Crear tabla proveedores
 cur.execute('''
             CREATE TABLE IF NOT EXISTS proveedores(
-                id_proveedor INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_proveedor BIGINT PRIMARY KEY,
                 nombre TEXT NOT NULL,
                 apellido TEXT NOT NULL,
                 telefono TEXT NOT NULL,

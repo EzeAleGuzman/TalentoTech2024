@@ -1,6 +1,6 @@
 from Menu import MostrarMenu
 from colorama import Fore
-from negocio import *
+from negocio.negocio import *
 
 
 MostrarMenu()
@@ -27,17 +27,20 @@ while (True):
         verProductos()
     elif (opcion == 3):
         comprar()
-
     elif (opcion == 4):
         print(Fore.CYAN+"-----------Venta de Productos---------")
         codigo = int(input("Ingrese codigo del producto:  "))
         cantidad = int(input("Ingrese la cantidad de producto comprado:  "))
         vender(codigo,cantidad)
-    elif (opcion == 7):
-        verificarBajoStock()
+    elif (opcion == 5):
+        codigo = int(input("Ingrese codigo del producto que desea eliminar:  "))
+        eliminarProducto(codigo)
     elif (opcion == 6):
         nombre = input("Cual es el nombre del producto que deseas buscar").lower()
-        buscarPorNombre(nombre)      
+        buscarPorNombre(nombre) 
+    elif (opcion == 7):
+        verificarBajoStock()
+     
     else:
         print('Ingrese Una opcion valida')
     MostrarMenu()
