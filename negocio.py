@@ -223,3 +223,12 @@ def crearTabla(productos):
         print(e)
     finally:
         pass
+
+#funcion para agregar nuevos clientes a la base de datos
+def agregarCliente(nombre,apellido, telefono):
+    con, cur =conectar()
+    cur.execute("INSERT INTO clientes (nombre, apellido, telefono) VALUES (?, ?, ?)", (nombre, apellido, telefono))
+    print("Cliente agregado correctamente")
+    con.commit()
+    cur.close()
+    con.close()
