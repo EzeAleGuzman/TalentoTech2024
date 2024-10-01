@@ -3,6 +3,7 @@ import datetime
 from colorama import Fore
 from beautifultable import BeautifulTable
 
+
 #Estafuncion crea la coneccion a base de datos
 def conectar():
     #coneccion a la base sino crea una nueva con ese nombre
