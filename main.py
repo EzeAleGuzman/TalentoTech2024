@@ -1,6 +1,6 @@
 from Menu import MostrarMenu
 from colorama import Fore
-from negocio.negocio import *
+from negocio.productos_negocio import *
 
 
 MostrarMenu()

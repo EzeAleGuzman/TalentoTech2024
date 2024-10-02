@@ -1,15 +1,17 @@
-import sqlite3
-from beautifultable import BeautifulTable
 from colorama import Fore
+#soluciona el problema de la ruta
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from utilitys import *
+from bd import conectar
 
 
-def conexion():
-    con = sqlite3.connect("produtos.db")
-    cur = con.cursor()
-    return con, cur
+
+con, cur = conectar()
 
 def crearProveedor(id_proveedor, nombre, apellido, telefono, id_direccion, estado_cuenta):
-    con, cur = conexion()
+    con, cur =  conectar()
     try:
         cur.execute("INSERT INTO proveedores (id_proveedor, nombre, apellido, telefono, id_direccion, estado_cuenta) VALUES (?, ?, ?, ?, ?, ?)", (id_proveedor, nombre, apellido, telefono, id_direccion, estado_cuenta))
         con.commit()
@@ -20,7 +22,7 @@ def crearProveedor(id_proveedor, nombre, apellido, telefono, id_direccion, estad
         con.close() 
 
 def verProveedores():
-    con, cur = conexion()
+    con, cur = conectar()
     cur.execute("SELECT * FROM proveedores")
     proveedores = cur.fetchall()
     table = BeautifulTable()
@@ -34,7 +36,7 @@ def verProveedores():
     print(Fore.RESET)
 
 def buscarProveedor(nombre):
-    con, cur = conexion()
+    con, cur = conectar()
     cur.execute("SELECT * FROM proveedores WHERE nombre = ?", (nombre,))
     proveedor = cur.fetchone()
     if proveedor:
@@ -48,7 +50,7 @@ def buscarProveedor(nombre):
     con.close()
 
 def actualizarProveedor(id_proveedor, nombre, apellido, telefono, id_direccion, estado_cuenta):
-    con, cur = conexion()
+    con, cur = conectar()
     try:
         cur.execute("UPDATE proveedores SET nombre = ?, apellido = ?, telefono = ?, id_direccion = ?, estado_cuenta = ? WHERE id_proveedor = ?", (nombre, apellido, telefono, id_direccion, estado_cuenta, id_proveedor))
         print("Proveedor actualizado correctamente")
@@ -60,7 +62,7 @@ def actualizarProveedor(id_proveedor, nombre, apellido, telefono, id_direccion, 
         con.close()
         
 def eliminarProveedor(id_proveedor):
-    con, cur = conexion()
+    con, cur = conectar()
     try:
         cur.execute("DELETE FROM proveedores WHERE id_proveedor = ?", (id_proveedor,))
         print("Proveedor eliminado correctamente")

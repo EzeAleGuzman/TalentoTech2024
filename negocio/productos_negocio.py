@@ -1,17 +1,16 @@
+
 import sqlite3
 import datetime
 from colorama import Fore
-from beautifultable import BeautifulTable
+#soluciona el problema de la ruta
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from utilitys import *
+from bd import conectar
 
 
-#Estafuncion crea la coneccion a base de datos
-def conectar():
-    #coneccion a la base sino crea una nueva con ese nombre
-    con = sqlite3.connect('productos.db')
-    #inicializo la funcion cursor()
-    cur = con.cursor()
-    #retorno la coneccion y el cursor
-    return con, cur
+cur, con = conectar()
 
 #Funcion para agregar producto
 def agregar(codigo, nombre, descripcion, precio, costo):
@@ -210,26 +209,3 @@ def verificarBajoStock():
     cur.close()
     con.close()
 
-#funcion para crear una tabla
-def crearTabla(productos):
-    try:
-        table = BeautifulTable()
-        table.columns.header = ["Codigo", "nombre", "descripcion", "stock"]
-        # Imprimimos los productos
-        for producto in productos:
-            table.rows.append(producto)
-        print(table)
-    #maneja la excepcion y la muestra en pantall
-    except Exception as e:
-        print(e)
-    finally:
-        pass
-
-#funcion para agregar nuevos clientes a la base de datos
-def agregarCliente(nombre,apellido, telefono):
-    con, cur =conectar()
-    cur.execute("INSERT INTO clientes (nombre, apellido, telefono) VALUES (?, ?, ?)", (nombre, apellido, telefono))
-    print("Cliente agregado correctamente")
-    con.commit()
-    cur.close()
-    con.close()

@@ -1,9 +1,17 @@
 import sqlite3
 
-# Se crea conexión o si no existe se crea la base de datos
-con = sqlite3.connect('productos.db')
-cur = con.cursor()
 
+#Estafuncion crea la coneccion a base de datos
+def conectar():
+    #coneccion a la base sino crea una nueva con ese nombre
+    con = sqlite3.connect('productos.db')
+    #inicializo la funcion cursor()
+    cur = con.cursor()
+    #retorno la coneccion y el cursor
+    return con, cur
+
+
+con, cur  = conectar()
 # Crear tabla productos
 cur.execute('''
             CREATE TABLE IF NOT EXISTS productos(

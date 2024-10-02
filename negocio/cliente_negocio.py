@@ -1,23 +1,20 @@
 
-import sqlite3
 from beautifultable import BeautifulTable
 from colorama import Fore
+#soluciona el problema de la ruta
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import bd
 
-#Estafuncion crea la coneccion a base de datos
-def conectar():
-    #coneccion a la base sino crea una nueva con ese nombre
-    con = sqlite3.connect('productos.db')
-    #inicializo la funcion cursor()
-    cur = con.cursor()
-    #retorno la coneccion y el cursor
-    return con, cur
+
 
 
 
 
 #funcion para crear un cliente
 def crearCliente(codigo,nombre, apellido, telefono, calle, altura,partido):
-    con, cur = conectar()
+    con, cur = bd.conectar()
     try:
         cur.execute("INSERT INTO direccion (calle, altura, partido) VALUES (?, ?, ?)", (calle, altura, partido))
         id_direccion= cur.lastrowid
@@ -31,7 +28,7 @@ def crearCliente(codigo,nombre, apellido, telefono, calle, altura,partido):
         con.close()
 
 def verClientes():
-    con, cur = conectar()
+    con, cur = bd.conectar()
     cur.execute("SELECT * FROM clientes")
     clientes = cur.fetchall()
     table = BeautifulTable()
@@ -47,7 +44,7 @@ def verClientes():
     
 
 def buscarCliente(nombre):
-    con, cur = conectar()
+    con, cur = bd.conectar()
     cur.execute("SELECT * FROM clientes WHERE nombre = ?", (nombre,))
     cliente = cur.fetchone()
     if cliente:
@@ -62,7 +59,7 @@ def buscarCliente(nombre):
     con.close()
 
 def actualizarCliente(id_cliente, nombre, apellido, telefono, id_direccion, estado_cuenta): 
-    con, cur = conectar()
+    con, cur = bd.conectar()
     try:
         cur.execute("UPDATE clientes SET nombre = ?, apellido = ?, telefono = ?, id_direccion = ?, estado_cuenta = ? WHERE id_cliente = ?", (nombre, apellido, telefono, id_direccion, estado_cuenta, id_cliente))
         print("Cliente actualizado correctamente")
@@ -74,7 +71,7 @@ def actualizarCliente(id_cliente, nombre, apellido, telefono, id_direccion, esta
         con.close()
 
 def eliminarCliente(id_cliente):
-    con, cur = conectar()
+    con, cur = bd.conectar()
     try:
         cur.execute("DELETE FROM clientes WHERE id_cliente = ?", (id_cliente,))
         print("Cliente eliminado correctamente")
@@ -85,5 +82,5 @@ def eliminarCliente(id_cliente):
         cur.close() 
         con.close()
 
-eliminarCliente(106)
+
 verClientes()
