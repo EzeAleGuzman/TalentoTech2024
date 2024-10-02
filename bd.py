@@ -1,13 +1,13 @@
 import sqlite3
 
 
-#Estafuncion crea la coneccion a base de datos
+#Esta funcion crea la coneccion a base de datos
 def conectar():
-    #coneccion a la base sino crea una nueva con ese nombre
+    #conexion a la base, si noexiste, crea una nueva con ese nombre
     con = sqlite3.connect('productos.db')
     #inicializo la funcion cursor()
     cur = con.cursor()
-    #retorno la coneccion y el cursor
+    #retorno la conexion y el cursor
     return con, cur
 
 

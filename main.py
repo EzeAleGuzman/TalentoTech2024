@@ -1,7 +1,9 @@
-from Menu import MostrarMenu
+
 from colorama import Fore
 from negocio.productos_negocio import *
-
+from negocio.cliente_negocio import *
+from negocio.proveedores_negocio import *
+from utilitys import *
 
 MostrarMenu()
 while (True):
