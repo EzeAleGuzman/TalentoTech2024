@@ -3,7 +3,7 @@ from colorama import Fore
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from utilidades import *
+from utilitys import *
 from bd import conectar
 
 
