@@ -81,6 +81,3 @@ def eliminarCliente(id_cliente):
     finally:
         cur.close() 
         con.close()
-
-
-verClientes()
