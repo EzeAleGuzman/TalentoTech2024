@@ -73,4 +73,3 @@ def eliminarProveedor(id_proveedor):
         cur.close()
         con.close()
         
-        

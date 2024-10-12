@@ -26,24 +26,30 @@ cur.execute('''
             )
 ''')
 
-# Crear tabla boletas
+# Crear tabla transacciones
 cur.execute('''
-            CREATE TABLE IF NOT EXISTS boletas(
-                id_boleta BIGINT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS transacciones(
+                id_transaccion INTEGER PRIMARY KEY AUTOINCREMENT,
                 fecha DATETIME NOT NULL,
-                total REAL NOT NULL
+                monto REAL NOT NULL,
+                tipo_transaccion TEXT NOT NULL CHECK (tipo_transaccion IN ('compra', 'venta', 'pago_cliente', 'pago_proveedor')),
+                id_cliente INTEGER,
+                id_proveedor INTEGER,
+                FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
+                FOREIGN KEY (id_proveedor) REFERENCES proveedores(id_proveedor)
             )
 ''')
 
-# Crear tabla detalle_boleta
+
+# Crear tabla detalle_transacciones
 cur.execute('''
-            CREATE TABLE IF NOT EXISTS detalle_boleta(
-                id_detalle_boleta  INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_boleta BIGINT NOT NULL,
+            CREATE TABLE IF NOT EXISTS detalle_transacciones(
+                id_detalle_transacciones  INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_transaccion BIGINT NOT NULL,
                 codigo_producto BIGINT NOT NULL,
                 cantidad INT NOT NULL,
                 subtotal REAL NOT NULL,
-                FOREIGN KEY (id_boleta) REFERENCES boletas(id_boleta),
+                FOREIGN KEY (id_transaccion) REFERENCES boletas(id_transaccion),
                 FOREIGN KEY (codigo_producto) REFERENCES productos(codigo)
             )
 ''')
@@ -84,19 +90,6 @@ cur.execute('''
             )
 ''')
 
-# Crear tabla transacciones
-cur.execute('''
-            CREATE TABLE IF NOT EXISTS transacciones(
-                id_transaccion INTEGER PRIMARY KEY AUTOINCREMENT,
-                fecha DATETIME NOT NULL,
-                monto REAL NOT NULL,
-                tipo_transaccion TEXT NOT NULL CHECK (tipo_transaccion IN ('compra', 'venta', 'pago_cliente', 'pago_proveedor')),
-                id_cliente INTEGER,
-                id_proveedor INTEGER,
-                FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
-                FOREIGN KEY (id_proveedor) REFERENCES proveedores(id_proveedor)
-            )
-''')
 
 # Confirmo los cambios en la base de datos
 con.commit()

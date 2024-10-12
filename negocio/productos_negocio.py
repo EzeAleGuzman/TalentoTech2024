@@ -35,13 +35,17 @@ def agregar(codigo, nombre, descripcion, precio, costo):
 #Funcion Para visualizar Los productos Almacenados en la base de datos
 def verProductos():
     con, cur =conectar()
+    #Busco en la base de datos todos los productos activos
     cur.execute("SELECT codigo, nombre, descripcion, stock FROM productos WHERE activo =TRUE")
+    #Obtengo los productos
     productos = cur.fetchall()
+    #Creamos una tabla
     table = BeautifulTable()
     if productos:
         table.columns.header = ["Codigo", "nombre", "descripcion", "stock"]
-        # Imprimimos los productos
+        # Recorremos los productos
         for producto in productos:
+            #Agrego la fila a la tabla
             table.rows.append(producto)
         print(table)
     else:
@@ -71,8 +75,9 @@ def buscarPorNombre(nombre):
 #Funcion para realizar una compra en el sistema
 def comprar():
     con, cur = conectar()
-    productos_comprados = []
+    productos_comprados = [] #Lista para almacenar los productos comprados
     id_boleta = crearBoleta()  # Función que genera el ID de la boleta
+    #Inicializo la fecha y el total
     fecha = datetime.date.today()
     total = 0
 
