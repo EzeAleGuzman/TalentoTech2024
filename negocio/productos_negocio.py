@@ -72,47 +72,47 @@ def buscarPorNombre(nombre):
     cur.close()
     con.close()
 
-#Funcion para realizar una compra en el sistema
 def comprar():
     con, cur = conectar()
-    productos_comprados = [] #Lista para almacenar los productos comprados
+    productos_comprados = []  # Lista para almacenar los productos comprados
     id_transaccion = crearBoleta()  # Función que genera el ID de la boleta
-    #Inicializo la fecha y el total
-    fecha = datetime.date.today()
-    total = 0
+    fecha = datetime.date.today()  # Inicializo la fecha
+    monto = 0  # Inicializo el total
     id_proveedor = int(input("Ingrese el ID del proveedor: "))
+
+    # Insertar la transacción con monto 0 al inicio
+    cur.execute("INSERT INTO transacciones (id_transaccion, fecha, monto, tipo_transaccion, id_cliente, id_proveedor) VALUES (?, ?, ?, ?, ?, ?)",
+                (id_transaccion, fecha, monto, 'compra', 0, id_proveedor))
 
     while True:
         opcion = int(input("""
         Elija una opción:
-    1--Agregar Nuevo Producto
-    2--Finalizar Compra
+        1--Agregar Nuevo Producto
+        2--Finalizar Compra
         """))
 
         if opcion == 1:
-            print(Fore.CYAN+"-----------Compra de Productos---------")
-            codigo = int(input("Ingrese codigo del producto:  "))
+            print(Fore.CYAN + "-----------Compra de Productos---------")
+            codigo = int(input("Ingrese código del producto:  "))
             cantidad = int(input("Ingrese la cantidad de producto comprado:  "))
-            
+
             # Validar si el producto existe
             cur.execute("SELECT * FROM productos WHERE codigo = ?", (codigo,))
             producto = cur.fetchone()
-            
+
             if producto:
-                # Insertar transaccion con el total inicial en 0
-                cur.execute("INSERT INTO transacciones (id_transaccion, fecha, total, tipo_transaccion, id_cliente, id_proveedor) VALUES (?, ?, ?, ?, ?, ?)", (id_transaccion, fecha, total, 'compra', 0 , id_proveedor)) 
-                precio_unitario = producto[6]  # Suponiendo que el precio está en la posición 5
+                precio_unitario = producto[6]  # Suponiendo que el precio está en la posición 6
                 sub_total = precio_unitario * cantidad
-                total += sub_total
-                
+                monto += sub_total
+
                 # Actualizar el stock del producto
-                cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?" , (cantidad, codigo))
+                cur.execute("UPDATE productos SET stock = stock + ? WHERE codigo = ?", (cantidad, codigo))
                 print("Stock actualizado para la compra")
-                
+
                 # Insertar el detalle de la boleta
-                cur.execute("INSERT INTO detalle_boleta (id_boleta, codigo_producto, cantidad, subtotal) VALUES (?, ?, ?, ?)",
+                cur.execute("INSERT INTO detalle_transacciones (id_transaccion, codigo_producto, cantidad, subtotal) VALUES (?, ?, ?, ?)",
                             (id_transaccion, codigo, cantidad, sub_total))
-                
+
                 # Agregar el producto comprado a la lista
                 productos_comprados.append({
                     'codigo': codigo,
@@ -122,12 +122,11 @@ def comprar():
                     'subtotal': sub_total
                 })
             else:
-                print(Fore.RED +"El producto no existe")
+                print(Fore.RED + "El producto no existe")
 
         elif opcion == 2:
-                    # Mostrar resumen de la compra
+            # Mostrar resumen de la compra
             print(Fore.LIGHTYELLOW_EX)
-            # Crear una tabla
             tabla = BeautifulTable()
 
             # Configurar los encabezados de la tabla
@@ -140,21 +139,24 @@ def comprar():
             print(tabla)
             print("-" * 80)
 
-            print(f"Total de la compra: ${total:.2f}")
+            print(f"Total de la compra: ${monto:.2f}")
 
-            # Actualizar el total en la transaccion
-            cur.execute("UPDATE boletas SET total = ? WHERE id_boleta = ?", (total, id_transaccion))
+            # Actualizar el total en la transacción
+            cur.execute("UPDATE transacciones SET monto = ? WHERE id_transaccion = ?", (monto, id_transaccion))
 
-            # Confirmar y finalizar la compra
-            print("Falta Verificar proveedores")# Mostrar resumen de la compra
+            # Actualizar el estado de cuenta del proveedor
+            cur.execute("UPDATE proveedores SET estado_cuenta = estado_cuenta - ? WHERE id_proveedor = ?", (monto, id_proveedor))
+
+            print("Compra finalizada con éxito")
             break
 
         else:
             print("Elija una opción válida.")
-    
+
     con.commit()
     cur.close()
     con.close()
+
 
 def crearBoleta():
     con, cur =conectar()
