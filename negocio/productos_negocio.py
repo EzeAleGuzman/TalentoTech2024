@@ -76,10 +76,11 @@ def buscarPorNombre(nombre):
 def comprar():
     con, cur = conectar()
     productos_comprados = [] #Lista para almacenar los productos comprados
-    id_boleta = crearBoleta()  # Función que genera el ID de la boleta
+    id_transaccion = crearBoleta()  # Función que genera el ID de la boleta
     #Inicializo la fecha y el total
     fecha = datetime.date.today()
     total = 0
+    id_proveedor = int(input("Ingrese el ID del proveedor: "))
 
     while True:
         opcion = int(input("""
@@ -98,8 +99,8 @@ def comprar():
             producto = cur.fetchone()
             
             if producto:
-                # Insertar boleta con el total inicial en 0
-                cur.execute("INSERT INTO boletas (id_boleta, fecha, total) VALUES (?, ?, ?)", (id_boleta, fecha, total))
+                # Insertar transaccion con el total inicial en 0
+                cur.execute("INSERT INTO transacciones (id_transaccion, fecha, total, tipo_transaccion, id_cliente, id_proveedor) VALUES (?, ?, ?, ?, ?, ?)", (id_transaccion, fecha, total, 'compra', 0 , id_proveedor)) 
                 precio_unitario = producto[6]  # Suponiendo que el precio está en la posición 5
                 sub_total = precio_unitario * cantidad
                 total += sub_total
@@ -110,7 +111,7 @@ def comprar():
                 
                 # Insertar el detalle de la boleta
                 cur.execute("INSERT INTO detalle_boleta (id_boleta, codigo_producto, cantidad, subtotal) VALUES (?, ?, ?, ?)",
-                            (id_boleta, codigo, cantidad, sub_total))
+                            (id_transaccion, codigo, cantidad, sub_total))
                 
                 # Agregar el producto comprado a la lista
                 productos_comprados.append({
@@ -135,14 +136,14 @@ def comprar():
             # Agregar filas a la tabla
             for item in productos_comprados:
                 tabla.rows.append([item['nombre'], item['cantidad'], f"${item['precio_unitario']:.2f}", f"${item['subtotal']:.2f}"])
-            print(f"-" * 19 + " Resumen de la compra Boleta N°" + str(id_boleta) + " " + "-" * 19)
+            print(f"-" * 19 + " Resumen de la compra Boleta N°" + str(id_transaccion) + " " + "-" * 19)
             print(tabla)
             print("-" * 80)
 
             print(f"Total de la compra: ${total:.2f}")
 
-            # Actualizar el total en la boleta
-            cur.execute("UPDATE boletas SET total = ? WHERE id_boleta = ?", (total, id_boleta))
+            # Actualizar el total en la transaccion
+            cur.execute("UPDATE boletas SET total = ? WHERE id_boleta = ?", (total, id_transaccion))
 
             # Confirmar y finalizar la compra
             print("Falta Verificar proveedores")# Mostrar resumen de la compra
@@ -157,8 +158,8 @@ def comprar():
 
 def crearBoleta():
     con, cur =conectar()
-    #Busca en la base de datos la ultima boleta y le suma 1
-    cur.execute("SELECT id_boleta FROM boletas ORDER BY id_boleta DESC LIMIT 1")
+    #Busca en la base de datos la ultima transaccion y le suma 1
+    cur.execute("SELECT id_transaccion FROM transacciones ORDER BY id_transaccion DESC LIMIT 1")
     ultimo_id = cur.fetchone()
 
     # Iniciar el nuevo número de boleta
@@ -166,10 +167,10 @@ def crearBoleta():
         nuevo_numero = ultimo_id[0] + 1
     else:
         nuevo_numero = 100000001 
-    id_boleta = nuevo_numero
+    id_transaccion = nuevo_numero
     cur.close()
     con.close()
-    return id_boleta
+    return id_transaccion
     
 def vender(codigo, stock):
     try:
