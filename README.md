@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="image.png" alt="Logo de TechStock" width="400">
+  <img src="Logo.png" alt="Logo de TechStock" width="400">
 </p>
 
 <h1 style="text-align: center;">TechStock</h1>
