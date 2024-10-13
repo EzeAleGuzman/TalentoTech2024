@@ -5,9 +5,61 @@ TechStock es una aplicación de consola desarrollada como parte de un proyecto d
 
 ## Comenzando 🚀
 
-_Estas instrucciones te permitirán obtener una copia del proyecto en funcionamiento en tu máquina local para propósitos de desarrollo y pruebas._
+Este proyecto esta desarrollado en python 3.11.5 y requiere la instalación de las siguientes dependencias:
 
-Mira **Deployment** para conocer como desplegar el proyecto.
+1. Descargar el repositorio
+
+Primero, clona este repositorio en tu máquina local. Abre una terminal y ejecuta el siguiente comando:
+
+```
+git clone https://github.com/usuario/techstock.git
+
+```
+Cambia al directorio del proyecto:
+
+```
+cd techstock
+
+```
+
+
+2. Crear y activar un entorno virtual (venv)
+
+    *Para asegurarse que las dependencias esten aisladas de las dependencias del sistema operativo, se recomienda crear un entorno virtual.
+    ejecutar el siguiente comando ebnn tu consola de comandos*
+
+```
+python3.11 -m venv venv
+
+```
+
+Luego, activa el entorno virtual:
+
+En Windows:
+
+```
+.\venv\Scripts\activate
+
+```
+
+En MacOS/Linux:
+
+```
+source venv/bin/activate
+```
+
+3. instalar las dependencias
+    *Para instalar las dependencias, ejecuta el siguiente comando en la terminal*
+
+```
+pip install -r requirements.txt
+```
+4. Ejecutar el proyecto
+    *Para ejecutar el proyecto, ejecuta el siguiente comando en la terminal*
+
+```
+python main.py
+``` 
 
 
 ### Pre-requisitos 📋
