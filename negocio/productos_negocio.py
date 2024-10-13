@@ -125,31 +125,33 @@ def comprar():
                 print(Fore.RED + "El producto no existe")
 
         elif opcion == 2:
-            # Mostrar resumen de la compra
-            print(Fore.LIGHTYELLOW_EX)
-            tabla = BeautifulTable()
+            # Si no hay productos comprados, eliminar la transaccion
+            if len(productos_comprados) == 0:
+                cur.execute("Delete from transacciones where id_transaccion = ?", (id_transaccion,))
+            else:
+                print(Fore.LIGHTYELLOW_EX)
+                tabla = BeautifulTable()
 
-            # Configurar los encabezados de la tabla
-            tabla.columns.header = ["Producto", "Cantidad", "Precio Unitario", "Subtotal"]
+                # Configurar los encabezados de la tabla
+                tabla.columns.header = ["Producto", "Cantidad", "Precio Unitario", "Subtotal"]
 
-            # Agregar filas a la tabla
-            for item in productos_comprados:
-                tabla.rows.append([item['nombre'], item['cantidad'], f"${item['precio_unitario']:.2f}", f"${item['subtotal']:.2f}"])
-            print(f"-" * 19 + " Resumen de la compra Boleta N°" + str(id_transaccion) + " " + "-" * 19)
-            print(tabla)
-            print("-" * 80)
+                # Agregar filas a la tabla
+                for item in productos_comprados:
+                    tabla.rows.append([item['nombre'], item['cantidad'], f"${item['precio_unitario']:.2f}", f"${item['subtotal']:.2f}"])
+                print(f"-" * 19 + " Resumen de la compra Boleta N°" + str(id_transaccion) + " " + "-" * 19)
+                print(tabla)
+                print("-" * 80)
 
-            print(f"Total de la compra: ${monto:.2f}")
+                print(f"Total de la compra: ${monto:.2f}")
 
-            # Actualizar el total en la transacción
-            cur.execute("UPDATE transacciones SET monto = ? WHERE id_transaccion = ?", (monto, id_transaccion))
+                # Actualizar el total en la transacción
+                cur.execute("UPDATE transacciones SET monto = ? WHERE id_transaccion = ?", (monto, id_transaccion))
 
-            # Actualizar el estado de cuenta del proveedor
-            cur.execute("UPDATE proveedores SET estado_cuenta = estado_cuenta - ? WHERE id_proveedor = ?", (monto, id_proveedor))
+                # Actualizar el estado de cuenta del proveedor
+                cur.execute("UPDATE proveedores SET estado_cuenta = estado_cuenta - ? WHERE id_proveedor = ?", (monto, id_proveedor))
 
-            print("Compra finalizada con éxito")
+                print("Compra finalizada con éxito")
             break
-
         else:
             print("Elija una opción válida.")
 
@@ -157,7 +159,7 @@ def comprar():
     cur.close()
     con.close()
 
-
+#Funcion para crear nuevo numero de transanccion
 def crearBoleta():
     con, cur =conectar()
     #Busca en la base de datos la ultima transaccion y le suma 1
@@ -177,14 +179,87 @@ def crearBoleta():
 def vender(codigo, stock):
     try:
         con, cur =conectar()
-        cur.execute("SELECT * FROM productos WHERE codigo = ? ", (codigo, ))
-        producto = cur.fetchone()
-        if producto:
-            cur.execute("UPDATE productos SET stock = stock - ? WHERE codigo = ?" , (stock, codigo))
-            print("stock actualizado para la venta")
+        productos_vendidos = []
+        id_transaccion = crearBoleta() # Función que genera el ID de la boleta
+        monto = 0 
+        id_comprador = int(input("Ingrese el ID del comprador: "))
+        fecha = datetime.date.today()
+        
+        # Insertar la transacción con monto 0 al inicio
+        cur.execute("INSERT INTO transacciones (id_transaccion, fecha, monto, tipo_transaccion, id_cliente, id_proveedor) VALUES (?, ?, ?, ?, ?, ?)",
+                (id_transaccion, fecha, monto, 'venta', id_comprador, 0))
+        
+        
+        while True:
+            opcion = int(input("""
+            Elija una opción:
+            1--Agregar Nuevo Producto
+            2--Finalizar Compra
+            """))
             
-        else:
-            print("El producto no existe")
+            if opcion == 1:
+                print(Fore.CYAN + "-----------Venta de Productos---------")
+                codigo = int(input("Ingrese codigo del producto:  "))
+                cantidad = int(input("Ingrese la cantidad de producto vendido:  "))
+                
+                # Validar si el producto existe
+                cur.execute("SELECT * FROM productos WHERE codigo = ?", (codigo,))
+                producto = cur.fetchone()
+                if producto:
+                    precio_unitario = producto[6]  # Suponiendo que el precio está en la posición 6
+                    sub_total = precio_unitario * cantidad
+                    monto += sub_total 
+                    # Actualizar el stock del producto
+                    cur.execute("UPDATE productos SET stock = stock - ? WHERE codigo = ?", (cantidad, codigo))
+                    print("Stock actualizado para la compra")
+                    # Insertar el detalle de la boleta
+                    cur.execute("INSERT INTO detalle_transacciones (id_transaccion, codigo_producto, cantidad, subtotal) VALUES (?, ?, ?, ?)",
+                            (id_transaccion, codigo, cantidad, sub_total))
+                
+                
+                    # Agregar el producto comprado a la lista
+                    productos_vendidos.append({
+                    'codigo': codigo,
+                    'nombre': producto[1],
+                    'cantidad': cantidad,
+                    'precio_unitario': precio_unitario,
+                    'subtotal': sub_total
+                    })
+                else:
+                    print(Fore.RED + "El producto no existe")
+            elif opcion == 2:
+                # Si no hay productos comprados, eliminar la transaccion
+                if len(productos_vendidos) == 0:
+                    cur.execute("Delete from transacciones where id_transaccion = ?", (id_transaccion,))
+                # Mostrar resumen de la compra
+                
+                else:
+                    print(Fore.LIGHTYELLOW_EX)
+                    tabla = BeautifulTable()
+
+                    #    Configurar los encabezados de la tabla
+                    tabla.columns.header = ["Producto", "Cantidad", "Precio Unitario", "Subtotal"]
+
+                    # Agregar filas a la tabla
+                    for item in productos_vendidos:
+                        tabla.rows.append([item['nombre'], item['cantidad'], f"${item['precio_unitario']:.2f}", f"${item['subtotal']:.2f}"])
+                    print(f"-" * 19 + " Resumen de la compra Boleta N°" + str(id_transaccion) + " " + "-" * 19)
+                    print(tabla)
+                    print("-" * 80)
+
+                    print(f"Total de la compra: ${monto:.2f}")
+
+                    # Actualizar el total en la transacción
+                    cur.execute("UPDATE transacciones SET monto = ? WHERE id_transaccion = ?", (monto, id_transaccion))
+
+                    # Actualizar el estado de cuenta del cliente
+                    cur.execute("UPDATE clientes SET estado_cuenta = estado_cuenta - ? WHERE id_cliente = ?", (monto, id_comprador))
+
+                    print("Compra finalizada con éxito")
+                break
+
+            else:
+                print("Elija una opción válida.")
     except sqlite3.IntegrityError:
             print(Fore.RED+"Cantidad Insuficiente para realizar venta. Verifique el stock")
             print(Fore.RESET)
