@@ -1,6 +1,7 @@
 <p align="center">
 ![alt text](image.png)
 </p>
+
 # TechStock
 
 TechStock es una aplicación de consola desarrollada como parte de un proyecto de curso, enfocada en gestionar el control de stock de productos tecnológicos y los estados de cuenta de clientes y proveedores. La aplicación maneja la lógica necesaria para realizar compras, ventas y actualizaciones de inventario de manera eficiente. A medida que continúa en desarrollo, se añaden nuevas funcionalidades para mejorar la experiencia de usuario y optimizar el flujo de trabajo en la gestión del inventario. Este proyecto refleja el aprendizaje práctico adquirido durante el curso.
