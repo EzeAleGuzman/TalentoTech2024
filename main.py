@@ -42,7 +42,6 @@ while (True):
         buscarPorNombre(nombre) 
     elif (opcion == 7):
         verificarBajoStock()
-     
     else:
         print('Ingrese Una opcion valida')
     MostrarMenu()
