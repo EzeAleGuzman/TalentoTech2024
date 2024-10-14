@@ -81,9 +81,7 @@ def comprar():
     id_proveedor = int(input("Ingrese el ID del proveedor: "))
 
     # Insertar la transacción con monto 0 al inicio
-    cur.execute("INSERT INTO transacciones (id_transaccion, fecha, monto, tipo_transaccion, id_cliente, id_proveedor) VALUES (?, ?, ?, ?, ?, ?)",
-                (id_transaccion, fecha, monto, 'compra', 0, id_proveedor))
-
+    cur.execute("INSERT INTO transacciones (id_transaccion, fecha, monto, tipo_transaccion, id_cliente, id_proveedor) VALUES (?, ?, ?, ?, ?, ?)",(id_transaccion, fecha, monto, 'compra', 0, id_proveedor))
     while True:
         opcion = int(input("""
         Elija una opción:
@@ -131,33 +129,26 @@ def comprar():
             else:
                 print(Fore.LIGHTYELLOW_EX)
                 tabla = BeautifulTable()
-
                 # Configurar los encabezados de la tabla
                 tabla.columns.header = ["Producto", "Cantidad", "Precio Unitario", "Subtotal"]
-
                 # Agregar filas a la tabla
                 for item in productos_comprados:
                     tabla.rows.append([item['nombre'], item['cantidad'], f"${item['precio_unitario']:.2f}", f"${item['subtotal']:.2f}"])
                 print(f"-" * 19 + " Resumen de la compra Boleta N°" + str(id_transaccion) + " " + "-" * 19)
                 print(tabla)
                 print("-" * 80)
-
                 print(f"Total de la compra: ${monto:.2f}")
-
-                # Actualizar el total en la transacción
-                cur.execute("UPDATE transacciones SET monto = ? WHERE id_transaccion = ?", (monto, id_transaccion))
-
-                # Actualizar el estado de cuenta del proveedor
-                cur.execute("UPDATE proveedores SET estado_cuenta = estado_cuenta - ? WHERE id_proveedor = ?", (monto, id_proveedor))
+                
+                actuallizarTotalTransaccion(monto, id_transaccion)
+                
+                actualizarEstadoDeCuenta('compra', monto, id_proveedor)
 
                 print("Compra finalizada con éxito")
             break
         else:
             print("Elija una opción válida.")
-
     con.commit()
-    cur.close()
-    con.close()
+    cerrarConexion()
 
 #Funcion para crear nuevo numero de transanccion
 def crearBoleta():
@@ -175,7 +166,7 @@ def crearBoleta():
     cur.close()
     con.close()
     return id_transaccion
-    
+
 def vender(codigo, stock):
     try:
         con, cur =conectar()
@@ -292,3 +283,20 @@ def verificarBajoStock():
     cur.close()
     con.close()
 
+# Actualizar el total en la transacción
+def actuallizarTotalTransaccion(monto, id_transaccion):
+    con, cur = conectar()
+    cur.execute("UPDATE transacciones SET monto = ? WHERE id_transaccion = ?", (monto, id_transaccion))
+
+# Actualizar el estado de cuenta del proveedor
+def actualizarEstadoDeCuenta(tipotransaccion, monto, id):
+    con, cur = conectar()
+    if tipotransaccion == 'venta':
+        cur.execute("UPDATE clientes SET estado_cuenta = estado_cuenta + ? WHERE id_cliente = ?", (monto, id))
+    elif tipotransaccion == 'compra':
+        cur.execute("UPDATE proveedores SET estado_cuenta = estado_cuenta - ? WHERE id_proveedor = ?", (monto, id))
+    cerrarConexion()
+
+def cerrarConexion():
+    con.close()
+    cur.close()
