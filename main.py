@@ -4,6 +4,12 @@ from negocio.productos_negocio import *
 from negocio.cliente_negocio import *
 from negocio.proveedores_negocio import *
 from utilitys import *
+import os
+
+
+def limpiar_consola():
+    os.system('cls')
+
 
 MostrarMenu()
 while (True):
@@ -12,6 +18,8 @@ while (True):
     except ValueError:
         print(Fore.RED + "Ingrese un número válido")
         continue
+    
+    limpiar_consola()
     
     if opcion == 8:
         print(Fore.RED + "##### Gracias por usar la app #####")
@@ -25,15 +33,13 @@ while (True):
         costo = float(input("Ingrese Precio de costo: "))
         agregar(codigo, nombre, descripcion, precio, costo)
     elif (opcion == 2):
-        print(Fore.BLUE+"-"* 35 +"Productos"+ "-" * 35)
+        print(Fore.BLUE+" Productos ".center(50, "-"))
         verProductos()
     elif (opcion == 3):
         comprar()
     elif (opcion == 4):
         print(Fore.CYAN+"-----------Venta de Productos---------")
-        codigo = int(input("Ingrese codigo del producto:  "))
-        cantidad = int(input("Ingrese la cantidad de producto comprado:  "))
-        vender(codigo,cantidad)
+        vender()
     elif (opcion == 5):
         codigo = int(input("Ingrese codigo del producto que desea eliminar:  "))
         eliminarProducto(codigo)
@@ -43,7 +49,7 @@ while (True):
     elif (opcion == 7):
         verificarBajoStock()
     else:
-        print('Ingrese Una opcion valida')
+        print(' Ingrese Una opcion valida '.center(50, "*"))
     MostrarMenu()
 
 print(Fore.BLACK)  

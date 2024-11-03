@@ -31,6 +31,7 @@ def agregar(codigo, nombre, descripcion, precio, costo):
             print(f"El producto {nombre.upper()} fue agregado correctamente")
         con.commit()
         cur.close()
+        con.close()
 
 #Funcion Para visualizar Los productos Almacenados en la base de datos
 def verProductos():
@@ -126,6 +127,7 @@ def comprar():
             # Si no hay productos comprados, eliminar la transaccion
             if len(productos_comprados) == 0:
                 cur.execute("Delete from transacciones where id_transaccion = ?", (id_transaccion,))
+                break
             else:
                 print(Fore.LIGHTYELLOW_EX)
                 tabla = BeautifulTable()
@@ -139,16 +141,17 @@ def comprar():
                 print("-" * 80)
                 print(f"Total de la compra: ${monto:.2f}")
                 
-                actuallizarTotalTransaccion(monto, id_transaccion)
+                cur.execute("UPDATE transacciones SET monto = ? WHERE id_transaccion = ?", (monto, id_transaccion))
                 
-                actualizarEstadoDeCuenta('compra', monto, id_proveedor)
+                cur.execute("UPDATE proveedores SET estado_cuenta = estado_cuenta - ? WHERE id_proveedor = ?", (monto, id_proveedor))
 
                 print("Compra finalizada con éxito")
             break
         else:
             print("Elija una opción válida.")
     con.commit()
-    cerrarConexion()
+    cur.close()
+    con.close()
 
 #Funcion para crear nuevo numero de transanccion
 def crearBoleta():
@@ -167,7 +170,7 @@ def crearBoleta():
     con.close()
     return id_transaccion
 
-def vender(codigo, stock):
+def vender():
     try:
         con, cur =conectar()
         productos_vendidos = []
@@ -189,7 +192,7 @@ def vender(codigo, stock):
             """))
             
             if opcion == 1:
-                print(Fore.CYAN + "-----------Venta de Productos---------")
+                print(Fore.CYAN + "Venta de Productos".center(50, "-"))
                 codigo = int(input("Ingrese codigo del producto:  "))
                 cantidad = int(input("Ingrese la cantidad de producto vendido:  "))
                 
@@ -197,7 +200,7 @@ def vender(codigo, stock):
                 cur.execute("SELECT * FROM productos WHERE codigo = ?", (codigo,))
                 producto = cur.fetchone()
                 if producto:
-                    precio_unitario = producto[6]  # Suponiendo que el precio está en la posición 6
+                    precio_unitario = producto[6]
                     sub_total = precio_unitario * cantidad
                     monto += sub_total 
                     # Actualizar el stock del producto
@@ -238,15 +241,15 @@ def vender(codigo, stock):
                     print(tabla)
                     print("-" * 80)
 
-                    print(f"Total de la compra: ${monto:.2f}")
+                    print(f"Total de la Venta: ${monto:.2f}")
 
                     # Actualizar el total en la transacción
                     cur.execute("UPDATE transacciones SET monto = ? WHERE id_transaccion = ?", (monto, id_transaccion))
 
                     # Actualizar el estado de cuenta del cliente
-                    cur.execute("UPDATE clientes SET estado_cuenta = estado_cuenta - ? WHERE id_cliente = ?", (monto, id_comprador))
+                    cur.execute("UPDATE clientes SET estado_cuenta = estado_cuenta + ? WHERE id_cliente = ?", (monto, id_comprador))
 
-                    print("Compra finalizada con éxito")
+                    print("Venta finalizada con éxito")
                 break
 
             else:
@@ -265,7 +268,7 @@ def eliminarProducto(codigo):
     producto = cur.fetchone()
     if producto:
         cur.execute("DELETE FROM productos WHERE  codigo = ?" , ( codigo, ))
-        print("Producto borrado correctamente")
+        print("Producto borrado correctamente".center(50, "#"))
     else:
         print("El producto no existe")
     con.commit()
@@ -279,24 +282,6 @@ def verificarBajoStock():
     if productos:
        crearTabla(productos)
     else:
-        print("No hay productos con Baja Cantidad.")
+        print(" No hay productos con Baja Cantidad. ".center(50, "*"))
     cur.close()
     con.close()
-
-# Actualizar el total en la transacción
-def actuallizarTotalTransaccion(monto, id_transaccion):
-    con, cur = conectar()
-    cur.execute("UPDATE transacciones SET monto = ? WHERE id_transaccion = ?", (monto, id_transaccion))
-
-# Actualizar el estado de cuenta del proveedor
-def actualizarEstadoDeCuenta(tipotransaccion, monto, id):
-    con, cur = conectar()
-    if tipotransaccion == 'venta':
-        cur.execute("UPDATE clientes SET estado_cuenta = estado_cuenta + ? WHERE id_cliente = ?", (monto, id))
-    elif tipotransaccion == 'compra':
-        cur.execute("UPDATE proveedores SET estado_cuenta = estado_cuenta - ? WHERE id_proveedor = ?", (monto, id))
-    cerrarConexion()
-
-def cerrarConexion():
-    con.close()
-    cur.close()
