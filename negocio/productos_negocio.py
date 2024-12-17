@@ -275,6 +275,65 @@ def eliminarProducto(codigo):
     cur.close()
     con.close()
 
+
+def buscarProducto(codigo):
+    try:
+        con, cur = conectar()
+        cur.execute("SELECT * FROM productos WHERE codigo = ?", (codigo,))
+        producto = cur.fetchone()
+        if producto:
+            return producto
+        else:
+            return None
+    except sqlite3.Error as e:
+        print(f"Error buscando producto: {e}")
+    except Exception as e:
+        print(f"Error buscando producto: {e}")
+    finally:
+        cur.close()
+        con.close()
+
+
+def actualizarProducto(codigo, nombre=None, descripcion=None, stock=None, precio=None, costo=None):
+    con, cur = conectar()
+
+    campos = []
+    valores = []
+
+    
+    if nombre is not None:
+            campos.append("nombre = ?")
+            valores.append(nombre)
+    if descripcion is not None:
+            campos.append("descripcion = ?")
+            valores.append(descripcion)
+    if stock is not None and stock != "":
+            campos.append("stock = ?")
+            valores.append(stock)
+    if precio is not None:
+            campos.append("precio = ?")
+            valores.append(precio)
+    if costo is not None:
+            campos.append("costo = ?")
+            valores.append(costo)
+
+    if campos:
+        try:
+           consulta = "UPDATE productos SET " + ", ".join(campos) + " WHERE codigo = ?"
+           valores.append(codigo)
+           cur.execute(consulta, tuple(valores))
+           print("Producto actualizado correctamente")
+           con.commit()
+        except sqlite3.Error as e:
+            print(f"Error actualizando producto: {e}")   
+        except Exception as e:
+            print(f"Error actualizando producto: {e}")
+        finally:
+            cur.close()
+            con.close()
+    
+
+
 def verificarBajoStock():
     con, cur =conectar()
     cur.execute("SELECT codigo, nombre, descripcion, stock FROM productos WHERE stock < 6 AND activo =TRUE ")
