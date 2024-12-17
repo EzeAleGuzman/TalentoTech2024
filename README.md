@@ -64,23 +64,27 @@ pip install -r requirements.txt
 ```
 python main.py
 ``` 
+## Estructura del Proyecto 📁
 
+La estructura del proyecto es organizada para facilitar la gestión de las dependencias y los módulos. Se utiliza una técnica para importar módulos desde directorios superiores, lo que permite que el código sea más flexible y fácil de mantener.
 
-### Pre-requisitos 📋
+La estructura del proyecto es la siguiente:
 
-
-
-### Instalación 🔧
-
-
+my_project/ │ ├── main.py ├── utilitys/ │ └── utilitys.py └── bd/ └── bd.py
 
 
 
-## Despliegue 📦
+### Solución para las importaciones
 
-_Agrega notas adicionales sobre como hacer deploy_
+En el archivo `main.py`, se utiliza el siguiente código para asegurarse de que los módulos ubicados en directorios superiores o hermanos sean accesibles:
 
-## Construido con 🛠️
+```python
+import sys
+import os
+
+# Añadir el directorio superior a sys.path para que las importaciones funcionen
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 
 
